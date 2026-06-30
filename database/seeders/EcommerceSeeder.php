@@ -28,13 +28,13 @@ class EcommerceSeeder extends Seeder
         // Demo categories
         if (Category::count() === 0) {
             $categories = [
+                ['name' => 'Beauty', 'slug' => 'beauty', 'description' => 'Beauty and skincare products', 'is_active' => true],
                 ['name' => 'Electronics', 'slug' => 'electronics', 'description' => 'Electronic devices', 'is_active' => true],
                 ['name' => 'Clothing', 'slug' => 'clothing', 'description' => 'Fashion and apparel', 'is_active' => true],
                 ['name' => 'Home & Garden', 'slug' => 'home-garden', 'description' => 'Home and garden items', 'is_active' => true],
                 ['name' => 'Sports', 'slug' => 'sports', 'description' => 'Sports equipment', 'is_active' => true],
                 ['name' => 'Books', 'slug' => 'books', 'description' => 'Books and magazines', 'is_active' => true],
                 ['name' => 'Toys', 'slug' => 'toys', 'description' => 'Toys and games', 'is_active' => true],
-                ['name' => 'Beauty', 'slug' => 'beauty', 'description' => 'Beauty products', 'is_active' => true],
                 ['name' => 'Automotive', 'slug' => 'automotive', 'description' => 'Car parts and accessories', 'is_active' => true],
             ];
 
@@ -45,15 +45,13 @@ class EcommerceSeeder extends Seeder
 
         // Demo products
         if (Product::count() === 0) {
+            $beauty = Category::where('slug', 'beauty')->first();
             $products = [
-                ['name' => 'Samsung 65" 4K TV', 'category_id' => 1, 'price' => 500, 'sale_price' => 499, 'description' => '4K Ultra HD Smart TV with HDR.', 'short_description' => '4K Ultra HD', 'stock' => 20, 'is_featured' => true, 'is_active' => true, 'image' => 'products/samsung-tv.jpg'],
-                ['name' => 'Apple iPad Pro', 'category_id' => 1, 'price' => 1199, 'description' => 'The most powerful iPad ever.', 'short_description' => 'Powerful tablet', 'stock' => 15, 'is_featured' => true, 'is_active' => true, 'image' => 'products/apple-ipad-pro.jpg'],
-                ['name' => 'Samsung Galaxy Watch', 'category_id' => 1, 'price' => 150, 'description' => 'Smartwatch with fitness tracking.', 'short_description' => 'Smart watch', 'stock' => 30, 'is_featured' => false, 'is_active' => true, 'image' => 'products/samsung-galaxy-watch.jpg'],
-                ['name' => 'HP Spectre x360', 'category_id' => 1, 'price' => 820, 'description' => 'Premium convertible laptop.', 'short_description' => 'Convertible laptop', 'stock' => 10, 'is_featured' => true, 'is_active' => true, 'image' => 'products/hp-spectre-x360.jpg'],
-                ['name' => 'JBL Bluetooth Speaker', 'category_id' => 1, 'price' => 120, 'description' => 'Portable bluetooth speaker.', 'short_description' => 'Portable speaker', 'stock' => 50, 'is_featured' => false, 'is_active' => true, 'image' => 'products/jbl-bluetooth-speaker.jpg'],
-                ['name' => 'Casual T-Shirt', 'category_id' => 2, 'price' => 25, 'description' => 'Comfortable cotton t-shirt.', 'short_description' => 'Cotton tee', 'stock' => 100, 'is_featured' => false, 'is_active' => true, 'image' => 'products/casual-t-shirt.jpg'],
-                ['name' => 'Running Shoes', 'category_id' => 4, 'price' => 89, 'description' => 'Lightweight running shoes.', 'short_description' => 'Lightweight', 'stock' => 40, 'is_featured' => true, 'is_active' => true, 'image' => 'products/running-shoes.jpg'],
-                ['name' => 'The Art of Code', 'category_id' => 5, 'price' => 35, 'description' => 'Programming best practices book.', 'short_description' => 'Learn coding', 'stock' => 25, 'is_featured' => false, 'is_active' => true, 'image' => 'products/the-art-of-code.jpg'],
+                ['name' => 'Hydrating Facial Serum', 'category_id' => $beauty?->id ?? 1, 'price' => 29.99, 'sale_price' => 24.99, 'description' => 'Deep hydration serum with vitamin C.', 'short_description' => 'Vitamin C serum', 'stock' => 50, 'is_featured' => true, 'is_active' => true, 'image' => 'products/hydrating-facial-serum.jpg'],
+                ['name' => 'Matte Lipstick Set', 'category_id' => $beauty?->id ?? 1, 'price' => 19.99, 'description' => 'Long-lasting matte lipstick collection.', 'short_description' => 'Matte lipstick', 'stock' => 80, 'is_featured' => true, 'is_active' => true, 'image' => 'products/matte-lipstick-set.jpg'],
+                ['name' => 'Silk Pillowcase', 'category_id' => $beauty?->id ?? 1, 'price' => 34.50, 'sale_price' => 29.99, 'description' => 'Pure silk pillowcase for hair and skin.', 'short_description' => 'Silk pillowcase', 'stock' => 40, 'is_featured' => false, 'is_active' => true, 'image' => 'products/silk-pillowcase.jpg'],
+                ['name' => 'Rose Water Toner', 'category_id' => $beauty?->id ?? 1, 'price' => 16.00, 'description' => 'Refreshing rose water facial toner.', 'short_description' => 'Rose toner', 'stock' => 60, 'is_featured' => false, 'is_active' => true, 'image' => 'products/rose-water-toner.jpg'],
+                ['name' => 'Reusable Makeup Remover Pads', 'category_id' => $beauty?->id ?? 1, 'price' => 12.50, 'description' => 'Eco-friendly reusable makeup remover pads.', 'short_description' => 'Eco pads', 'stock' => 120, 'is_featured' => false, 'is_active' => true, 'image' => 'products/makeup-remover-pads.jpg'],
             ];
 
             foreach ($products as $product) {

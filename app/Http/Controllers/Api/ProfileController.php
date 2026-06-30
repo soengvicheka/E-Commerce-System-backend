@@ -29,6 +29,21 @@ class ProfileController extends Controller
         return response()->json($user);
     }
 
+    public function uploadAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => 'required|image|max:2048',
+        ]);
+
+        $user = Auth::user();
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->update(['avatar' => $path]);
+        }
+
+        return response()->json($user);
+    }
+
     public function changePassword(Request $request): JsonResponse
     {
         $request->validate([

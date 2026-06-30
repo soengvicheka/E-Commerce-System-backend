@@ -32,7 +32,9 @@ class OrderController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
+            'customer_name' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:1000',
+            'phone' => 'required|string|max:30',
             'payment_method' => 'required|string|max:50',
             'notes' => 'nullable|string|max:1000',
         ]);
@@ -50,6 +52,8 @@ class OrderController extends Controller
 
         $order = Order::create([
             'user_id' => Auth::id(),
+            'customer_name' => $request->customer_name,
+            'phone' => $request->phone,
             'order_number' => 'ORD-' . time() . '-' . rand(1000, 9999),
             'subtotal' => $subtotal,
             'tax' => $tax,

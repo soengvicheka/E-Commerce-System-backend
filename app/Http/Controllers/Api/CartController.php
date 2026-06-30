@@ -16,8 +16,23 @@ class CartController extends Controller
         $cartItems = Cart::where('user_id', Auth::id())
             ->with('product.category')
             ->get();
-        $total = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
-        return response()->json(['items' => $cartItems, 'total' => $total]);
+
+        $items = $cartItems->map(fn($item) => [
+            'id' => $item->id,
+            'product_id' => $item->product_id,
+            'quantity' => $item->quantity,
+            'product' => [
+                'id' => $item->product->id,
+                'name' => $item->product->name,
+                'price' => $item->product->price,
+                'image' => $item->product->image,
+                'category' => $item->product->category ? ['name' => $item->product->category->name] : null,
+            ],
+        ])->toArray();
+
+        $total = collect($items)->sum(fn($item) => ($item['product']['price'] ?? 0) * $item['quantity']);
+
+        return response()->json(['items' => $items, 'total' => $total]);
     }
 
     public function store(Request $request): JsonResponse

@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'show']);
         Route::put('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
+        Route::post('/profile/avatar', [\App\Http\Controllers\Api\ProfileController::class, 'uploadAvatar']);
         Route::post('/profile/password', [\App\Http\Controllers\Api\ProfileController::class, 'changePassword']);
 
         Route::get('/wishlist', [\App\Http\Controllers\Api\WishlistController::class, 'index']);

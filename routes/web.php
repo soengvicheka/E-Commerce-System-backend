@@ -37,7 +37,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return back()->with('error', 'Invalid credentials.');
     });
 
-    Route::middleware(['web', 'auth', 'admin'])->group(function () {
+    Route::middleware(['web', 'admin'])->group(function () {
         Route::get('/logout', function (\Illuminate\Http\Request $request) {
             Auth::logout();
             $request->session()->invalidate();
