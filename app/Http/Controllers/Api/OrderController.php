@@ -9,6 +9,8 @@ use App\Models\OrderItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -18,6 +20,7 @@ class OrderController extends Controller
             ->with('items.product')
             ->latest()
             ->paginate(10);
+
         return response()->json($orders);
     }
 
@@ -26,6 +29,7 @@ class OrderController extends Controller
         $order = Order::where('user_id', Auth::id())
             ->with('items.product')
             ->findOrFail($id);
+
         return response()->json($order);
     }
 
@@ -81,7 +85,71 @@ class OrderController extends Controller
 
         Cart::where('user_id', Auth::id())->delete();
 
+        $this->sendTelegramOrderAlert($order);
+
         $order->load('items.product');
         return response()->json($order, 201);
+    }
+
+    protected function sendTelegramOrderAlert(Order $order): void
+    {
+        $chatId = config('services.telegram.chat_id');
+        $token  = config('services.telegram.bot_token');
+
+        if (! $chatId || ! $token) {
+            Log::warning('Telegram alert skipped: missing chat_id or bot_token.');
+            return;
+        }
+
+        $text = $this->buildTelegramText($order);
+
+        try {
+            $response = Http::timeout(10)
+                ->retry(2, 250)
+                ->withOptions(['verify' => false])
+                ->post(
+                    "https://api.telegram.org/bot{$token}/sendMessage",
+                    [
+                        'chat_id' => $chatId,
+                        'text' => $text,
+                        'parse_mode' => 'HTML',
+                    ]
+                );
+
+            if (! $response->successful()) {
+                Log::warning('Telegram alert failed: ' . $response->body());
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Telegram alert failed: ' . $e->getMessage());
+        }
+    }
+
+    protected function buildTelegramText(Order $order): string
+    {
+        $lines = [
+            '<b>New Order Received</b>',
+            '',
+            "Order: <b>{$order->order_number}</b>",
+            "Customer: {$order->customer_name}",
+            "Phone: {$order->phone}",
+            "Payment: {$order->payment_method}",
+            "Status: {$order->status}",
+            "Total: \$" . number_format((float) $order->total, 2),
+            '',
+            '<b>Items:</b>',
+        ];
+
+        foreach ($order->items as $item) {
+            $lines[] = "• {$item->product_name} x{$item->quantity} = \$" . number_format((float) $item->subtotal, 2);
+        }
+
+        $lines[] = '';
+        $lines[] = "Shipping to: {$order->shipping_address}";
+
+        if (! empty($order->notes)) {
+            $lines[] = "Notes: {$order->notes}";
+        }
+
+        return implode("\n", $lines);
     }
 }

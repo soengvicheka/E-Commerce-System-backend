@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Order;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,8 +30,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/dashboard/stats', [\App\Http\Controllers\Api\DashboardController::class, 'stats']);
 
     // Auth
-    Route::post('/auth/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
-    Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
+
+    // Google Social Login – frontend redirect flow
+    // Google redirects back to the SPA at /auth/google/callback with a ?code=...
+    Route::post('/auth/google/callback', [AuthController::class, 'googleCallback']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);

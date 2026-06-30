@@ -30,7 +30,12 @@ class CategoryController extends Controller
         ]);
 
         $data['slug'] = Str::slug($data['name']);
-        $data['is_active'] = $request->has('is_active');
+        $originalSlug = $data['slug'];
+        $counter = 1;
+        while (Category::where('slug', $data['slug'])->exists()) {
+            $data['slug'] = $originalSlug . '-' . $counter;
+            $counter++;
+        }
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('categories', 'public');
@@ -56,6 +61,12 @@ class CategoryController extends Controller
         ]);
 
         $data['slug'] = Str::slug($data['name']);
+        $originalSlug = $data['slug'];
+        $counter = 1;
+        while (Category::where('slug', $data['slug'])->where('id', '!=', $category->id)->exists()) {
+            $data['slug'] = $originalSlug . '-' . $counter;
+            $counter++;
+        }
         $data['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('image')) {
