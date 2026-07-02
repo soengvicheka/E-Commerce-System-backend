@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
-use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -77,22 +76,46 @@ class AuthController extends Controller
         ]);
 
         try {
-            // Prevent reuse by requiring state is NOT sent (we don't use state in this simple flow)
-            // Socialite exchanges the authorization code for user info using client_secret on the backend.
-            $socialiteUser = Socialite::driver('google')->stateless()->userFromCode($request->code);
+            $redirectUri = config('services.google.redirect');
 
-            $user = \App\Models\User::where('email', $socialiteUser->getEmail())->first();
+            $tokenResponse = Http::timeout(10)
+                ->withOptions(['verify' => false])
+                ->post('https://oauth2.googleapis.com/token', [
+                    'code' => $request->code,
+                    'client_id' => config('services.google.client_id'),
+                    'client_secret' => config('services.google.client_secret'),
+                    'redirect_uri' => $redirectUri,
+                    'grant_type' => 'authorization_code',
+                ]);
+
+            if (! $tokenResponse->successful()) {
+                return response()->json(['message' => 'Google token exchange failed'], 401);
+            }
+
+            $accessToken = $tokenResponse->json('access_token');
+
+            $socialiteUser = Http::timeout(10)
+                ->withOptions(['verify' => false])
+                ->withToken($accessToken)
+                ->get('https://www.googleapis.com/oauth2/v3/userinfo');
+
+            if (! $socialiteUser->successful()) {
+                return response()->json(['message' => 'Google user info fetch failed'], 401);
+            }
+
+            $payload = $socialiteUser->json();
+            $user = \App\Models\User::where('email', $payload['email'] ?? '')->first();
 
             if (! $user) {
                 $user = \App\Models\User::create([
-                    'name'     => $socialiteUser->getName() ?? 'Google User',
-                    'email'    => $socialiteUser->getEmail(),
+                    'name'     => $payload['name'] ?? 'Google User',
+                    'email'    => $payload['email'],
                     'password' => Hash::make(Str::random(24)),
-                    'avatar'   => $socialiteUser->getAvatar(),
+                    'avatar'   => $payload['picture'] ?? null,
                 ]);
             } else {
-                if ($socialiteUser->getAvatar()) {
-                    $user->update(['avatar' => $socialiteUser->getAvatar()]);
+                if (!empty($payload['picture'])) {
+                    $user->update(['avatar' => $payload['picture']]);
                 }
                 if (empty($user->email_verified_at)) {
                     $user->update(['email_verified_at' => now()]);
