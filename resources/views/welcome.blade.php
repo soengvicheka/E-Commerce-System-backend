@@ -13,7 +13,7 @@
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-16">
-                <a href="/" class="text-2xl font-bold text-purple-700">Electshop</a>
+                <a href="/" class="text-2xl font-bold text-purple-700">VKEN.shop</a>
                 <nav class="hidden md:flex items-center gap-6">
                     <a href="/" class="text-gray-700 hover:text-purple-600 font-medium">Home</a>
                     <a href="#products" class="text-gray-700 hover:text-purple-600 font-medium">Products</a>
@@ -28,15 +28,13 @@
     </header>
 
     <!-- Hero -->
-    <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-        <div class="max-w-7xl mx-auto px-4 py-20 flex items-center">
-            <div class="md:w-1/2">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Best Quality<br>Best Price</h1>
-                <p class="text-purple-100 mb-6 text-lg">Discover amazing products at unbeatable prices. Shop with confidence.</p>
-                <a href="#products" class="inline-block px-8 py-3 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-50 transition">Shop Now</a>
-            </div>
-            <div class="hidden md:block md:w-1/2">
-                <img src="{{ asset('assets/hero.png') }}" alt="Hero" class="w-full" style="max-height: 400px; object-fit: contain;">
+    <section class="text-white relative" style="background: url('/assets/hero.png') center/cover no-repeat;">
+        <div class="max-w-7xl mx-auto px-4 py-24 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-5 tracking-tight">Discover Quality Products</h1>
+            <p class="text-lg md:text-xl text-white/85 mb-10 max-w-3xl mx-auto leading-relaxed">Shop the latest trends with confidence. Free shipping over $500 and 30-day returns.</p>
+            <div class="inline-flex items-center gap-4">
+                <a href="#products" class="px-8 py-3 bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-full font-semibold transition shadow-lg shadow-primary/20">Shop Now</a>
+                <a href="#categories" class="px-8 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full font-semibold transition">Browse All</a>
             </div>
         </div>
     </section>
