@@ -89,7 +89,10 @@ class AuthController extends Controller
                 ]);
 
             if (! $tokenResponse->successful()) {
-                return response()->json(['message' => 'Google token exchange failed'], 401);
+                return response()->json([
+                    'message' => 'Google token exchange failed',
+                    'google_error' => $tokenResponse->json(),
+                ], 401);
             }
 
             $accessToken = $tokenResponse->json('access_token');
@@ -100,7 +103,10 @@ class AuthController extends Controller
                 ->get('https://www.googleapis.com/oauth2/v3/userinfo');
 
             if (! $socialiteUser->successful()) {
-                return response()->json(['message' => 'Google user info fetch failed'], 401);
+                return response()->json([
+                    'message' => 'Google user info fetch failed',
+                    'google_error' => $socialiteUser->json(),
+                ], 401);
             }
 
             $payload = $socialiteUser->json();
